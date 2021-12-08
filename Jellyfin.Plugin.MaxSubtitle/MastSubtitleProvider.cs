@@ -68,7 +68,7 @@ namespace Jellyfin.Plugin.MaxSubtitle
                     Format = x?.Format,
                     Id = x?.Id,
                     Name = x?.Name,
-                    ThreeLetterISOLanguageName = "Maxsubtitle",
+                    ThreeLetterISOLanguageName = "Chi",
                     IsHashMatch = false,
                 };
             });
@@ -82,7 +82,7 @@ namespace Jellyfin.Plugin.MaxSubtitle
             return new SubtitleResponse
             {
                 Format = s.Format,
-                Language = "Maxsubtitle",
+                Language = "Chi",
                 Stream = s.Content,
             };
         }
