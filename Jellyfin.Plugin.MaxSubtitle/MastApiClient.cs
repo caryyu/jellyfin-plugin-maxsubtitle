@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using MediaBrowser.Model.Serialization;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Net.Http.Json;
 
 namespace Jellyfin.Plugin.MaxSubtitle
 {
@@ -13,17 +13,14 @@ namespace Jellyfin.Plugin.MaxSubtitle
     public sealed class MastApiClient
     {
         private IHttpClientFactory httpClientFactory;
-        private IJsonSerializer jsonSerializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MastApiClient"/> class.
         /// </summary>
         /// <param name="httpClientFactory">Instance of the <see cref="IHttpClientFactory"/> interface.</param>
-        /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
-        public MastApiClient(IHttpClientFactory httpClientFactory, IJsonSerializer jsonSerializer)
+        public MastApiClient(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory;
-            this.jsonSerializer = jsonSerializer;
         }
 
         /// <summary>
@@ -49,8 +46,7 @@ namespace Jellyfin.Plugin.MaxSubtitle
 
             HttpResponseMessage response = await httpClientFactory.CreateClient().GetAsync(url, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            Stream content = await response.Content.ReadAsStreamAsync(cancellationToken);
-            List<ApiSubtitle> result = await jsonSerializer.DeserializeFromStreamAsync<List<ApiSubtitle>>(content);
+            List<ApiSubtitle> result = await response.Content.ReadFromJsonAsync<List<ApiSubtitle>>(cancellationToken: cancellationToken);
             return result;
         }
 
