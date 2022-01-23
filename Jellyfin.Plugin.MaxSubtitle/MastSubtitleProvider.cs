@@ -46,7 +46,7 @@ namespace Jellyfin.Plugin.MaxSubtitle
             if (!string.IsNullOrEmpty(info.Name))
             {
                 _logger.LogInformation($"[Max Subtitle] Search of [name]: \"{info.Name}\"");
-                List<ApiSubtitle> res = await _mastApiClient.Search(info.Name);
+                List<ApiSubtitle> res = await _mastApiClient.Search(info.Name, cancellationToken);
                 list.AddRange(res);
             }
 
@@ -77,7 +77,7 @@ namespace Jellyfin.Plugin.MaxSubtitle
         /// <inheritdoc />
         public async Task<SubtitleResponse> GetSubtitles(string id, CancellationToken cancellationToken)
         {
-            var s = await _mastApiClient.Download(id);
+            var s = await _mastApiClient.Download(id, cancellationToken);
 
             return new SubtitleResponse
             {

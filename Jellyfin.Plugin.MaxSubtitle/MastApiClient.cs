@@ -1,11 +1,9 @@
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using MediaBrowser.Model.Serialization;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.Net.Http.Headers;
+using System.Threading;
 
 namespace Jellyfin.Plugin.MaxSubtitle
 {
@@ -45,23 +43,23 @@ namespace Jellyfin.Plugin.MaxSubtitle
             set { _apiBaseUri = value; }
         }
 
-        public async Task<List<ApiSubtitle>> Search(string keyword)
+        public async Task<List<ApiSubtitle>> Search(string keyword, CancellationToken cancellationToken = default)
         {
             string url = $"{ApiBaseUri}/subtitle/search/{keyword}";
 
-            HttpResponseMessage response = await httpClientFactory.CreateClient().GetAsync(url).ConfigureAwait(false);
+            HttpResponseMessage response = await httpClientFactory.CreateClient().GetAsync(url, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            Stream content = await response.Content.ReadAsStreamAsync();
+            Stream content = await response.Content.ReadAsStreamAsync(cancellationToken);
             List<ApiSubtitle> result = await jsonSerializer.DeserializeFromStreamAsync<List<ApiSubtitle>>(content);
             return result;
         }
 
-        public async Task<Subtitle> Download(string id)
+        public async Task<Subtitle> Download(string id, CancellationToken cancellationToken = default)
         {
             string url = $"{ApiBaseUri}/subtitle/{id}/download";
-            HttpResponseMessage response = await httpClientFactory.CreateClient().GetAsync(url).ConfigureAwait(false);
+            HttpResponseMessage response = await httpClientFactory.CreateClient().GetAsync(url, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            Stream content = await response.Content.ReadAsStreamAsync();
+            Stream content = await response.Content.ReadAsStreamAsync(cancellationToken);
 
             string filename = response.Content.Headers.ContentDisposition.FileName;
             string ext = Path.GetExtension(filename).Remove(0, 1);
